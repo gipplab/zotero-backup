@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-""" Download the grouplens bibliography from zotero, write the output to a file.
+""" Download a bibliography from zotero, write the output to a bibtex file.
 
 Zotero has a way of checking if things have changed, which we use. If the bibliography has not changed, then
 we do not write anything to the file.
@@ -13,7 +13,6 @@ Docs:
 * https://github.com/brechtm/citeproc-py
 """
 
-import argparse
 import json
 import os
 import re
@@ -28,14 +27,14 @@ LINK_START_REGEX = re.compile(r"start=(\d+)")
 
 
 def _write_current_version(version_id):
-    with open(os.getenv("ZTH_VERSION_FILE"), "w") as version_file:
+    with open(os.getenv("ZB_VERSION_FILE"), "w") as version_file:
         version_file.write(str(version_id))
 
 
 def _read_current_version():
     ver = 0
     try:
-        with open(os.getenv("ZTH_VERSION_FILE"), "r") as version_file:
+        with open(os.getenv("ZB_VERSION_FILE"), "r") as version_file:
             ver = int(version_file.read())
     except IOError:
         pass
@@ -63,15 +62,15 @@ def _get_next_start(links_header):
 
 def get_bib_from_zotero(min_version=0, offset=0):
     """fetch bibliography as csljson, returns the next offset or None if we're done"""
-    url = "https://api.zotero.org/%s/items" % os.environ["ZTH_SEARCH_PREFIX_URI"]
+    url = "https://api.zotero.org/%s/items" % os.environ["ZB_SEARCH_PREFIX_URI"]
     url_params = {
-        "key": os.getenv("ZTH_API_KEY"),
+        "key": os.getenv("ZB_API_KEY"),
         "v": 3,
         "sort": "date",
-        "tag": os.getenv("ZTH_SEARCH_TAG"),
+        "tag": os.getenv("ZB_SEARCH_TAG"),
         "format": "json",
         "include": "bib,csljson",
-        "style": os.getenv("ZTH_CITEPROC_STYLE"),
+        "style": os.getenv("ZB_CITEPROC_STYLE"),
         "start": offset,
         "limit": 100
     }
@@ -96,14 +95,6 @@ def get_bib_from_zotero(min_version=0, offset=0):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="download bibliography from zotero into citeproc_json file.")
-    parser.add_argument("-o", "--out", dest="outfile", help="output file name")
-    args = parser.parse_args()
-
-    # validate args
-    if not args.outfile:
-        raise ValueError("Requires -o to run.")
-
     logger.info("starting")
     min_version = _read_current_version()
 

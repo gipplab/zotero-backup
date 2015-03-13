@@ -1,13 +1,10 @@
-# zotero-to-html
+# zotero-backup
 
-turn a zotero collection into an html page
+turn a zotero collection into a bibtex file for archival
 
-This code first downloads a bibliography using uses the
+This code basically just downloads a bibliography using the
 [Zotero API](https://www.zotero.org/support/dev/web_api/v3/basics),
-then parses that bibliography into html for display on the web.  It asks Zotero politely
-whether the bibliography has changed since the last run, to keep things lightweight unless things have changed.
-However, this process will rebuild the entire bibliography from scratch each time the version changes, so it may not
-scale to extremely large bibliographies, especially those that are changed often.
+It asks Zotero politely whether the bibliography has changed since the last run, to keep things lightweight unless things have changed.
 
 
 # requirements
