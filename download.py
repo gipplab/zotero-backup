@@ -8,22 +8,17 @@ we do not write anything to the file.
 
 Docs:
 * https://www.zotero.org/support/dev/web_api/v3/basics
-* https://www.zotero.org/styles/
 * https://www.zotero.org/settings/keys
-* https://github.com/brechtm/citeproc-py
 """
 
-import json
+import io
 import os
-import re
 import requests
 
 # local imports
 import env
 
 logger = env.logger()
-
-LINK_START_REGEX = re.compile(r"start=(\d+)")
 
 
 def _write_current_version(version_id):
@@ -41,78 +36,60 @@ def _read_current_version():
     return ver
 
 
-def _get_next_start(links_header):
-    """parse the zotero `Link` header into a new start value, or None if we're done.
-
-    >>> link = '<https://api.zotero.org/groups/14159/items?include=bib%2Ccsljson&limit=100&sort=date&start=100&style=acm-sigchi-proceedings&v=3>; rel="next", <https://api.zotero.org/groups/14159/items?include=bib%2Ccsljson&limit=100&sort=date&start=400&style=acm-sigchi-proceedings&v=3>; rel="last", <https://www.zotero.org/groups/14159/items>; rel="alternate"'
-    >>> link_without_next = '<https://api.zotero.org/groups/14159/items?include=bib%2Ccsljson&limit=100&sort=date&style=acm-sigchi-proceedings&v=3>; rel="first", <https://www.zotero.org/groups/14159/items>; rel="alternate"'
-    >>> _get_next_start(link)
-    100
-    >>> _get_next_start(link_without_next) is None
-    True
-    """
-    if links_header is not None:
-        parts = links_header.split('; rel="next"')
-        if len(parts) >= 2:
-            match = LINK_START_REGEX.search(parts[0])
-            if match and len(match.groups()) == 1:
-                return int(match.groups()[0])
-    return None
-
-
 def get_bib_from_zotero(min_version=0, offset=0):
     """fetch bibliography as csljson, returns the next offset or None if we're done"""
     url = "https://api.zotero.org/%s/items" % os.environ["ZB_SEARCH_PREFIX_URI"]
     url_params = {
-        "key": os.getenv("ZB_API_KEY"),
-        "v": 3,
         "sort": "date",
         "tag": os.getenv("ZB_SEARCH_TAG"),
-        "format": "json",
-        "include": "bib,csljson",
-        "style": os.getenv("ZB_CITEPROC_STYLE"),
+        "format": "bibtex",
         "start": offset,
         "limit": 100
     }
-
-    url_headers = {"If-Modified-Since-Version": str(min_version)}
+    url_headers = {
+        "Zotero-API-Version": 3,
+        "Authorization": "Bearer %s" % os.getenv("ZB_API_KEY"),
+        "If-Modified-Since-Version": str(min_version)
+    }
     r = requests.get(url, params=url_params, headers=url_headers)
 
-    if r.status_code == 304:
-        # bibliography has not changed
-        logger.info("no change. current version: %d" % min_version)
-        next_start = None
-        parsed_response = None
-    else:
+    bibtex = None
+    if r.status_code == 200:
+        new_version = r.headers["Last-Modified-Version"]
         if offset == 0:
-            new_version = r.headers["Last-Modified-Version"]
             logger.info("downloading new version of bibliography. new version: %s" % new_version)
             _write_current_version(new_version)
-        next_start = _get_next_start(r.headers["Link"])
-        parsed_response = r.json()
+        bibtex = r.text
+    elif r.status_code == 304:
+        # bibliography has not changed
+        logger.info("no change. current version: %d" % min_version)
+    else:
+        logger.info("other error: %d" % r.status_code)
 
-    return next_start, parsed_response
+    return bibtex
 
 
 def main():
     logger.info("starting")
     min_version = _read_current_version()
 
-    # zotero limits us to query one page at a time when we include the "bib" format
     offset = 0
-    bib_entries_from_zotero = []
+    responses_from_zotero = []
     while offset is not None:
-        offset_new, parsed_response = get_bib_from_zotero(min_version, offset)
-        if offset_new and offset_new <= offset:
-            raise Exception("going backwards!")
+        logger.info("requesting offset {}".format(offset))
+        response_body = get_bib_from_zotero(min_version, offset)
+        if response_body:
+            offset += 100
+            responses_from_zotero.append(response_body)
         else:
-            offset = offset_new
-        if parsed_response:
-            bib_entries_from_zotero.extend(parsed_response)
+            offset = None
 
-    if len(bib_entries_from_zotero) > 0:
-        with open(args.outfile, "w") as out:
-            json.dump(bib_entries_from_zotero, out, indent=2)
+    if len(responses_from_zotero) > 0:
+        new_min_version = _read_current_version()
+        fn = "%s-v%05d.bib" % (os.getenv("ZB_BIBTEX_FILE"), int(new_min_version))
+        with io.open(fn, "w", encoding="UTF-8") as out:
+            for rsp in responses_from_zotero:
+                out.write(rsp)
 
     exit(0)
 

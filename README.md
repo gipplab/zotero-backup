@@ -23,11 +23,7 @@ You probably should use a virtualenv, then:
 Edit `.env` directly or create `.env.local` to override the settings.  In particular, you will need to override the
 zotero api key, the zotero search parameters, and the output paths.
 
-If you're querying a group, you can find its id by visiting a url like this:
-
-    https://api.zotero.org/users/1800868/groups?v=3&key=FOOFOOFOO
-
-If you want to write your own templates, copy the tmpl directory somewhere, edit the files, and change `ZTH_TMPL_DIR`
+If you're querying a group, you can find its id by visiting its page, then inspecting the URL for its RSS feed.
 
 
 # run
