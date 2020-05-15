@@ -1,9 +1,15 @@
 language: python
 python:
 - '2.7'
-# command to install dependencies
 install:
-  - pip install -r requirements.txt
-
-script:
-  make
+- pip install -r requirements.txt
+script: make
+deploy:
+  provider: releases
+  api_key:
+    secure: Ro3sHHqjy5p+xM0j+9hscBepVzDUdvgHKephmHzonakV5oX/vXYj0fFz8NANlKUOoBP8HVhx3+3/kVBWK+CojkyXpCRh1JNtAsdOxWj4g+xDEc2hZFcaqGia6xxZ5DJEhoFD23rVInmzZe/SuNJGXAiLsDzdPE/TjFNfet+1nLdKplGBtrXTS96a2Phs2ERPs9W05YFV6tB6BuJZJW9/QvG0WNY2FeRO1BgGzcgYcMJjcINav0SXHIVrzGr8W2ok2lqBbbC/PICYfIzDU7UlnGcQyyCTTlRu/UXJiVOZzRt/xknk76F5AoqZsxE14b8tqPXcklA3oMMdAFT3tQPYyoqQuNDUxxW/nK2ThDCaY4D2BL9BtlNQNjg7GhDiodm2Br2qu4/SulLHCoUhXUPs7MjrQYlS4pFAbpVLGNjDQiLK9h1XLATXjSeDEMyAQfwzjQYeS9q0uY/MjquDZ7SBRW9uXy2wSuCcuTAu0E34+LSTdDHtlc9Ycu8Zfzs2F8+RRnUs+j4XLyJvPL97nUMYAHkIvp0uMLCmKTkInULoI66pkP3zTAEWW/S+n+t0QPIaVy/oueZ5CcKw/tG+YIHbhM/+qG9jo+JZ+5u4KFbFFZU5EJ2ljoCr0eap81SgUGawxQsmWSHYYCpOV8OnMBmFDBdxYX9a5Fh0xB5KnSw1E1s=
+  file_glob: true
+  file: out/*
+  on:
+    repo: ag-gipp/zotero-backup
+  skip_cleanup: 'true'
