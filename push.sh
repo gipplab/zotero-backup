@@ -7,7 +7,6 @@ setup_git() {
 
 commit_files() {
   cd data
-  git checkout master
   git add -A
   git commit -am "Update backup data (build $TRAVIS_BUILD_NUMBER)"
   cd ..
