@@ -7,12 +7,13 @@ setup_git() {
 
 commit_files() {
   cd data
+  git checkout master
   git add -A
   git commit -am "Update backup data (build $TRAVIS_BUILD_NUMBER)"
   cd ..
   git add -A
   git commit -am "Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
-  git push --recurse-submodules=on-demand
+  git push --recurse-submodules=on-demand origin HEAD:master
 }
 
 

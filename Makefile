@@ -4,7 +4,6 @@ include .env*
 
 all: $(ZB_VERSION_FILE)
 	$(ZB_PYTHON) ./download.py
-	if [ -e $(ZB_OUT_DIR)/*.bib ]; then gzip $(ZB_OUT_DIR)/*bib; fi;
 
 $(ZB_VERSION_FILE): 
 	mkdir -p $(ZB_OUT_DIR)
