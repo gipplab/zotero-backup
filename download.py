@@ -42,7 +42,8 @@ def get_bib_from_zotero(min_version=0, offset=0):
     url_params = {
         "sort": "date",
         "tag": os.getenv("ZB_SEARCH_TAG"),
-        "format": os.getenv("ZB_DUMP_FORMAT"),
+        "format": "json",
+        "include": "data,bib"
         "start": offset,
         "limit": 100
     }
@@ -86,7 +87,7 @@ def main():
 
     if len(responses_from_zotero) > 0:
         new_min_version = _read_current_version()
-        fn = "%s-v%05d.bib" % (os.getenv("ZB_BIBTEX_FILE"), int(new_min_version))
+        fn = os.getenv("ZB_FILE")
         with io.open(fn, "w", encoding="UTF-8") as out:
             for rsp in responses_from_zotero:
                 out.write(rsp)

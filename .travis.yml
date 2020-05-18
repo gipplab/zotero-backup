@@ -8,10 +8,9 @@ after_success:
 - source push.sh
 env:
   matrix:
-  - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_BIBTEX_FILE="${ZB_OUT_DIR}/my-bibliography"
-    ZB_VERSION_FILE="${ZB_OUT_DIR}/.last-modified-version" ZB_DUMP_FORMAT=bibtex
-  - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_BIBTEX_FILE="${ZB_OUT_DIR}/bibo-json"
-    ZB_VERSION_FILE="${ZB_OUT_DIR}/.last-modified-version-json" ZB_DUMP_FORMAT=json
+  - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_FILE="${ZB_OUT_DIR}/latest.json"
+    ZB_VERSION_FILE="${ZB_OUT_DIR}/.last-modified-version"
+
   global:
   - PYTHONIOENCODING="utf-8"
   - ZB_PYTHON=python
