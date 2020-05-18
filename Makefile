@@ -1,5 +1,3 @@
-include .env*
-
 .PHONY: all clean out
 
 all: $(ZB_VERSION_FILE)
