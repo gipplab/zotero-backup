@@ -8,12 +8,12 @@ setup_git() {
 commit_files() {
   cd data
   git add -A
-  git commit -am "Update backup data (build $TRAVIS_BUILD_NUMBER)"
+  git commit -am "[skip ci] Update backup data (build $TRAVIS_BUILD_NUMBER)"
   git checkout -b updater
   git branch -u origin/master     
   cd ..
   git add -A
-  git commit -am "Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
+  git commit -am "[skip ci] Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
   git checkout -b updater
   git branch -u origin/master  
   git push --recurse-submodules=on-demand origin updater:master

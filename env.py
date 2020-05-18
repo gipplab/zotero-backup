@@ -6,11 +6,7 @@ import logging
 import os
 
 __ready__ = False
-
-
-def _init_env():
-    dotenv.read_dotenv('.env.local')
-    dotenv.read_dotenv('.env')    
+  
 
 
 def _get_log_level():
@@ -38,7 +34,6 @@ def init():
     """ready the environment"""
     global __ready__
     if not __ready__:
-        _init_env()
         _init_logger()
         __ready__ = True
 
