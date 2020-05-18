@@ -25,7 +25,7 @@ def _init_logger():
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
     outdir = loglevel = os.getenv("ZB_OUT_DIR", "out")
 
-    handler = logging.FileHandler('out/application.log')
+    handler = logging.FileHandler($outdir+'/application.log')
     handler.setLevel(_get_log_level())
     handler.setFormatter(formatter)
 
