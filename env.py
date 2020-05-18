@@ -25,9 +25,16 @@ def _init_logger():
     handler.setLevel(_get_log_level())
     handler.setFormatter(formatter)
 
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
     l = logging.getLogger()
     l.setLevel(logging.DEBUG)
     l.addHandler(handler)
+    l.addHandler(ch)
     
 
 def init():
