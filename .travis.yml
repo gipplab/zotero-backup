@@ -6,6 +6,8 @@ install:
 script: make
 after_success:
 - source push.sh
+deploy:
+  skip_cleanup: true
 env:
   matrix:
     - ZB_SEARCH_PREFIX_URI=2504334 ZB_OUT_DIR="data/testRepo"
