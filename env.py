@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import dotenv
 import logging
 import os
 
 __ready__ = False
-  
 
 
 def _get_log_level():
@@ -19,9 +17,9 @@ def _get_log_level():
 
 def _init_logger():
     formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
-    outdir = loglevel = os.getenv("ZB_OUT_DIR", "out")
+    outdir = os.getenv("ZB_OUT_DIR", "out")
 
-    handler = logging.FileHandler(outdir+'/application.log')
+    handler = logging.FileHandler(outdir + '/application.log')
     handler.setLevel(_get_log_level())
     handler.setFormatter(formatter)
 
@@ -34,7 +32,7 @@ def _init_logger():
     l.setLevel(logging.DEBUG)
     l.addHandler(handler)
     l.addHandler(ch)
-    
+
 
 def init():
     """ready the environment"""
@@ -49,4 +47,3 @@ def logger():
     if not __ready__:
         init()
     return logging.getLogger()
-
