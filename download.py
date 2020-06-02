@@ -48,7 +48,7 @@ def get_bib_from_zotero(min_version=0, offset=0):
         "limit": 100
     }
     url_headers = {
-        "Zotero-API-Version": 3,
+        "Zotero-API-Version": "3",
         "Authorization": "Bearer %s" % os.getenv("ZB_API_KEY"),
         "If-Modified-Since-Version": str(min_version)
     }

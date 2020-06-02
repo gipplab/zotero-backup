@@ -1,5 +1,7 @@
 # zotero-backup
 
+Note: This repository was forked from https://github.com/maxharp3r/zotero-backup.
+
 turn a zotero collection into a bibtex file for archival
 
 This code basically just downloads a bibliography using the
@@ -9,7 +11,7 @@ It asks Zotero politely whether the bibliography has changed since the last run,
 
 # requirements
 
-* python 2.7.x (not tested on python 3)
+* python 3.7.x
 * gnu make
 * zotero API key (create one at https://www.zotero.org/settings/keys)
 
