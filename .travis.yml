@@ -20,7 +20,6 @@ before_install:
     -d
   - chmod 600 github_deploy_key
   - chmod 600 github_deploy_key_2
-  - eval $(ssh-agent -s)
   - export GIT_SSH_COMMAND="ssh -i github_deploy_key"
   - git submodule init
   - git submodule update
