@@ -21,15 +21,15 @@ before_install:
   - chmod 600 github_deploy_key
   - chmod 600 github_deploy_key_2
   - eval $(ssh-agent -s)
-  - ssh-add github_deploy_key
   - ssh-add github_deploy_key_2
+  - ssh-add github_deploy_key
   - git submodule init
   - git submodule update
 install:
 - pip install -r requirements.txt
-script: make
-after_success:
-- source push.sh
+script:
+  - make
+  - source push.sh
 env:
   matrix:
   - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_FILE="${ZB_OUT_DIR}/latest.json"
