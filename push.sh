@@ -9,20 +9,14 @@ commit_files() {
   cd data
   git add -A
   git commit -am "[skip ci] Update backup data (build $TRAVIS_BUILD_NUMBER)"
-  git checkout -b updater
-  git branch -u origin/master
-  git rebase
-  git push
+  git push origin HEAD:master
   cd ..
-  git add -A
-  git commit -am "[skip ci] Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
-  git checkout -b updater
   git remote add ssh git@github.com:ag-gipp/zotero-backup.git
   git fetch ssh
-  git branch -u ssh/master
-  git rebase
+  git add -A
+  git commit -am "[skip ci] Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
   export GIT_SSH_COMMAND="ssh -i github_deploy_key_2"
-  git push ssh updater:master
+  git push ssh HEAD:master
 }
 
 
