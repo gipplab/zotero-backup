@@ -27,7 +27,8 @@ install:
 - pip install -r requirements.txt
 script:
   - make
-  - source push.sh
+after_success:
+- source push.sh
 env:
   matrix:
   - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_FILE="${ZB_OUT_DIR}/latest.json"
