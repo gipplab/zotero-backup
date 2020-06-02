@@ -12,7 +12,9 @@ Docs:
 """
 
 import io
+import json
 import os
+
 import requests
 
 # local imports
@@ -80,17 +82,20 @@ def main():
         logger.info("requesting offset {}".format(offset))
         response_body = get_bib_from_zotero(min_version, offset)
         if response_body:
-            offset += 100
-            responses_from_zotero.append(response_body)
+            payload = json.loads(response_body)
+            if len(payload) > 0:
+                offset += 100
+                responses_from_zotero.extend(payload)
+            else:
+                offset = None
         else:
             offset = None
 
     if len(responses_from_zotero) > 0:
-        new_min_version = _read_current_version()
+        _read_current_version()
         fn = os.getenv("ZB_FILE")
         with io.open(fn, "w", encoding="UTF-8") as out:
-            for rsp in responses_from_zotero:
-                out.write(rsp)
+            out.write(json.dumps(responses_from_zotero, indent=2, sort_keys=True))
 
     exit(0)
 
