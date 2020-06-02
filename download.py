@@ -45,7 +45,7 @@ def get_bib_from_zotero(min_version=0, offset=0):
         "sort": "date",
         "tag": os.getenv("ZB_SEARCH_TAG"),
         "format": "json",
-        "include": "data",
+        "include": "data,biblatex",
         "start": offset,
         "limit": 100
     }
