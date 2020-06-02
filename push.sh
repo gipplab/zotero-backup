@@ -18,7 +18,8 @@ commit_files() {
   git checkout -b updater
   git branch -u origin/master
   git rebase
-  git push --recurse-submodules=on-demand origin updater:master
+  git remote add ssh git@github.com:ag-gipp/zotero-backup.git
+  git push --recurse-submodules=on-demand ssh updater:master
 }
 
 
