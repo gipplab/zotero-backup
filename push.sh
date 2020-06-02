@@ -10,6 +10,7 @@ commit_files() {
   git add -A
   git commit -am "[skip ci] Update backup data (build $TRAVIS_BUILD_NUMBER)"
   export GIT_SSH_COMMAND="ssh -i $TRAVIS_BUILD_DIR/github_deploy_key"
+  git rebase origin/master
   git push origin HEAD:master
   cd ..
   git remote add ssh git@github.com:ag-gipp/zotero-backup.git
