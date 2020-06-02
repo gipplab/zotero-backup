@@ -16,9 +16,10 @@ commit_files() {
   git add -A
   git commit -am "[skip ci] Update link to backup data (build $TRAVIS_BUILD_NUMBER)"
   git checkout -b updater
-  git branch -u origin/master
-  git rebase
   git remote add ssh git@github.com:ag-gipp/zotero-backup.git
+  git fetch ssh
+  git branch -u ssh/master
+  git rebase
   git push --recurse-submodules=on-demand ssh updater:master
 }
 
