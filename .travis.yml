@@ -33,6 +33,8 @@ env:
   matrix:
   - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_FILE="${ZB_OUT_DIR}/latest.json"
     ZB_VERSION_FILE="${ZB_OUT_DIR}/.last-modified-version"
+  - ZB_SEARCH_PREFIX_URI=groups/2480461 ZB_OUT_DIR="data/ag-gipp" ZB_FILE="${ZB_OUT_DIR}/latest.json"
+    ZB_VERSION_FILE="${ZB_OUT_DIR}/.last-modified-version"
   global:
   - PYTHONIOENCODING="utf-8"
   - ZB_PYTHON=python

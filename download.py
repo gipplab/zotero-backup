@@ -83,7 +83,9 @@ def main():
         response_body = get_bib_from_zotero(min_version, offset)
         if response_body:
             payload = json.loads(response_body)
-            if len(payload) > 0:
+            new_records = len(payload)
+            logger.info("got {} new records".format(new_records))
+            if new_records > 0:
                 offset += 100
                 responses_from_zotero.extend(payload)
             else:
