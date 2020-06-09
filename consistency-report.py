@@ -26,7 +26,7 @@ def parse_extra_field(d, ent):
             if len(parts) == 2:
                 extra_dictionary[parts[0].strip()] = parts[1].strip()
             else:
-                log_problem(ent, 'unlabeled extra information: ' + e)
+                log_problem(ent, 'information in extra field not formatted as key-value pair: ' + e)
     return extra_dictionary
 
 
@@ -44,8 +44,8 @@ with open(filename) as f:
             if 'Citation Key' in edict:
                 cite_key = edict['Citation Key']
                 if len(cite_key) < 4:
-                    log_problem(entry, cite_key + ' is too short as citation key.')
+                    log_problem(entry, cite_key + ' is too short as a citation key.')
         if 'filename' in data:
             fname = data['filename']
             if not file_pat.search(fname):
-                log_problem(entry, "does not comply with naming convention:" + fname)
+                log_problem(entry, "does not comply with file naming convention:" + fname)
