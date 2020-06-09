@@ -26,7 +26,7 @@ def parse_extra_field(d, ent):
             if len(parts) == 2:
                 extra_dictionary[parts[0].strip()] = parts[1].strip()
             else:
-                log_problem(ent, 'information in extra field not formatted as key-value pair: ' + e)
+                log_problem(ent, 'information in extra field not formatted as key:value pair: ' + e)
     return extra_dictionary
 
 
