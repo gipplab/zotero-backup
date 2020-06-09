@@ -43,10 +43,10 @@ with open(filename) as f:
             edict = parse_extra_field(data['extra'], entry)
             if 'Citation Key' in edict:
                 cite_key = edict['Citation Key']
-                if len(cite_key) < 4:
+                if len(cite_key) < 3:
                     log_problem(entry, cite_key + ' is too short as a citation key.')
         if 'filename' in data:
             fname = data['filename']
             if not file_pat.search(fname):
-                if not "Snapshot" in fname
+                if not "Snapshot" in fname:
                     log_problem(entry, "does not comply with file naming convention:" + fname)
