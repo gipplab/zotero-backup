@@ -4,6 +4,7 @@ import sys
 
 filename = sys.argv[1]
 log = {}
+all_keys = []
 
 
 def get_user(meta):
@@ -35,6 +36,15 @@ def parse_extra_field(d, ent):
     return extra_dictionary
 
 
+def has_valid_parent(e):
+    if 'parentItem' in e['data']:
+        # We daringly assume that the parent occurs before its children.
+        if e['data']['parentItem'] in all_keys:
+            return True
+
+    return False
+
+
 with open(filename) as f:
     bibtex = json.loads(f.read())
     file_pat = re.compile('--[a-zA-Z]{2,}--')
@@ -42,6 +52,7 @@ with open(filename) as f:
         data = entry['data']
         tags = data['tags']
         biblatex = entry['biblatex']
+        all_keys.append(data['key'])
         if len(tags) == 0 and len(biblatex) > 3:
             log_problem(entry, "has no tags")
         if 'extra' in data:
@@ -53,7 +64,7 @@ with open(filename) as f:
         if 'filename' in data:
             fname = data['filename']
             if not file_pat.search(fname):
-                if "Snapshot" not in fname + data.get('title', ''):
+                if "Snapshot" not in fname + data.get('title', '') and has_valid_parent(entry):
                     log_problem(entry, "does not comply with file naming convention:" + fname)
 
     for key, value in log.items():
