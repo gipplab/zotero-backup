@@ -28,8 +28,14 @@ install:
 script:
   - python ./download.py
   - python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
-after_success:
-- source push.sh
+after_script:
+  - source push.sh
+notifications:
+  email:
+    recipients:
+      - n@meuschke.org
+    on_success: change
+    on_failure: always
 env:
   matrix:
   - ZB_SEARCH_PREFIX_URI=groups/2504334 ZB_OUT_DIR="data/testRepo" ZB_FILE="${ZB_OUT_DIR}/latest.json"

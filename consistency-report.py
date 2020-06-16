@@ -67,5 +67,8 @@ with open(filename) as f:
                 if "Snapshot" not in fname + data.get('title', '') and has_valid_parent(entry):
                     log_problem(entry, 'does not comply with file naming convention: ' + fname)
 
-    for key, value in log.items():
-        print(f'### {key}\n\n{value}\n\n')
+    if len(log) > 0:
+        for key, value in log.items():
+            print(f'### {key}\n\n{value}\n\n')
+
+        exit(1)
