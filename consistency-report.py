@@ -3,6 +3,7 @@ import re
 import sys
 
 filename = sys.argv[1]
+log = {}
 
 
 def get_user(meta):
@@ -16,7 +17,10 @@ def log_problem(e, msg):
     current_key = e['data']['key']
     link = e['data']['parentItem'] if 'parentItem' in e['data'] else current_key
     usr = get_user(e['meta'])
-    print(f'[{current_key}](https://www.zotero.org/groups/2480461/ag-gipp/items/{link}/item-details) {msg} ({usr})')
+    string = log.get(usr, '')
+    string += f'[{current_key}](https://www.zotero.org/groups/2480461/ag-gipp/items/{link}/item-details) {msg} (' \
+              f'{usr})\n\n'
+    log[usr] = string
 
 
 def parse_extra_field(d, ent):
@@ -52,3 +56,6 @@ with open(filename) as f:
             if not file_pat.search(fname):
                 if not "Snapshot" in fname:
                     log_problem(entry, "does not comply with file naming convention:" + fname)
+
+    for key, value in log.items():
+        print(f'### {key}\n\n{value}\n\n')
