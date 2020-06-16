@@ -67,8 +67,8 @@ def get_bib_from_zotero(min_version=0, offset=0):
         # bibliography has not changed
         logger.info("no change. current version: %d" % min_version)
     else:
-        logger.info("other error: %d" % r.status_code)
-
+        logger.error("other error: %d" % r.status_code)
+        exit(1)
     return bibtex
 
 
