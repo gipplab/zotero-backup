@@ -54,7 +54,7 @@ with open(filename) as f:
         if 'filename' in data:
             fname = data['filename']
             if not file_pat.search(fname):
-                if not "Snapshot" in fname:
+                if "Snapshot" not in fname + data.get('title', ''):
                     log_problem(entry, "does not comply with file naming convention:" + fname)
 
     for key, value in log.items():
