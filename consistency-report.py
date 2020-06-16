@@ -18,8 +18,7 @@ def log_problem(e, msg):
     link = e['data']['parentItem'] if 'parentItem' in e['data'] else current_key
     usr = get_user(e['meta'])
     string = log.get(usr, '')
-    string += f'[{current_key}](https://www.zotero.org/groups/2480461/ag-gipp/items/{link}/item-details) {msg} (' \
-              f'{usr})\n\n'
+    string += f'[{current_key}](https://www.zotero.org/groups/2480461/ag-gipp/items/{link}/item-details) {msg}\n\n'
     log[usr] = string
 
 
