@@ -2,7 +2,7 @@
 
 Note: This repository was forked from https://github.com/maxharp3r/zotero-backup.
 
-turn a zotero collection into a bibtex file for archival
+Turn a zotero collection into a bibtex file for archival
 
 This code basically just downloads a bibliography using the
 [Zotero API](https://www.zotero.org/support/dev/web_api/v3/basics),
