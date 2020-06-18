@@ -12,6 +12,8 @@ def get_user(meta):
         user_info = meta['createdByUser']
         if 'name' in user_info:
             return user_info['name']
+        else:
+            return user_info['username']
 
 
 def log_problem(e, msg):
