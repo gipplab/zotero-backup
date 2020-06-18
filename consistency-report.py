@@ -10,7 +10,7 @@ all_keys = []
 def get_user(meta):
     if 'createdByUser' in meta:
         user_info = meta['createdByUser']
-        if 'name' in user_info:
+        if user_info['name']:
             return user_info['name']
         else:
             return user_info['username']
