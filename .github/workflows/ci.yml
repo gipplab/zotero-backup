@@ -1,0 +1,59 @@
+name: CI Zotero Backup
+
+# Since february 2021 GitHub actions skip commits with
+# certain keywords, such as "[skip ci]"
+on: 
+  push:
+    branches: [master]
+
+env:
+  ZB_SEARCH_PREFIX_URI: groups/2480461
+  ZB_OUT_DIR: "data/ag-gipp"
+  ZB_FILE: "${ZB_OUT_DIR}/latest.json"
+  ZB_VERSION_FILE: "${ZB_OUT_DIR}/.last-modified-version"
+
+jobs:
+  backup:
+    name: Backup Zotero
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Zotero backup repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'false'
+      - name: Checkout private data submodule
+        env: 
+          DATA_SSH_KEY: ${{ secrets.BACKUP_DATA_ZOTERO_REPO_KEY }}
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "$DATA_SSH_KEY" > $HOME/.ssh/data_deploy.key
+          chmod 600 $HOME/.ssh/data_deploy.key
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
+          git submodule update --init --recursive
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.7'
+      - name: Install python requirements
+        run: pip install -r requirements.txt
+      - name: Download Zotero data
+        run: python ./download.py
+      - name: Check data consistency
+        run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
+      - name: Push updates
+        # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
+        # from above does not exist here. Hence, we first update the link and after that
+        # set the GIT_SSH_COMMAND again
+        run: |
+          git config --global user.name 'GitHub Deploy Action'
+          git config --global user.email 'github-actions@users.noreply.github.com'
+          git add -A
+          git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
+          git push
+          cd data
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
+          git add -A
+          git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
+          git fetch origin
+          git rebase origin/master
+          git push origin HEAD:master
