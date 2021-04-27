@@ -53,9 +53,6 @@ jobs:
         run: |
           git config --global user.name 'GitHub Deploy Action'
           git config --global user.email 'github-actions@users.noreply.github.com'
-          git add -A
-          git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
-          git push
           cd data
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
           git add -A
@@ -63,3 +60,8 @@ jobs:
           git fetch origin
           git rebase origin/master
           git push origin HEAD:master
+          cd ..
+          unset GIT_SSH_COMMAND
+          git add -A
+          git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
+          git push
