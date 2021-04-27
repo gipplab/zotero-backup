@@ -74,7 +74,6 @@ jobs:
           username: ${{ secrets.NOTIF_MAIL_USER }}
           password: ${{ secrets.NOTIF_MAIL_PW }}
           subject: "GitHub CI Failure during Zotero Backup"
-          body: file://.github/failure-report-mail.md
-          convert_markdown: true
+          html_body: '<p>The GitHub workflow ${{ github.workflow }} in ${{ github.repository }} finished on <b>${{ job.status }}<b></p><p>Further details can be accessed at the <a href="https://github.com/ag-gipp/zotero-backup/actions">GitHub CI overview page</a>.</p><p><b>Detailed Reasons:</b><br>Event causing the failure: ${{ github.event_name }}<br>Author: ${{ github.event.commits.author.name }}<br>E-Mail: ${{ github.event.commits.author.email }}<br>Commit Message: ${{ github.event.commits.message }}<br>Commit ID: <a href="${{ github.event.commits.url }}">${{ github.event.commits.id }}</a><br></p>'
           to: andre.greiner-petter@t-online.de
           from: GitHub Zotero CI
