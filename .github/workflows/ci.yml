@@ -1,7 +1,9 @@
 name: CI Zotero Backup
 
-# Since february 2021 GitHub actions skip commits with
-# certain keywords, such as "[skip ci]"
+# Cron Job triggers via POSIX cron syntax in UTC. More details on
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events
+# Monday to Friday at 5:30am UTC 
+# - cron: '30 5 * * 1-5'
 on: 
   push:
     branches: [master]
@@ -33,7 +35,7 @@ jobs:
           echo "$DATA_SSH_KEY" > $HOME/.ssh/data_deploy.key
           chmod 600 $HOME/.ssh/data_deploy.key
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
-          git submodule update --init --recursive
+          git submodule update --init --recursive --remote --rebase
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -57,8 +59,6 @@ jobs:
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
           git add -A
           git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
-          git fetch origin
-          git rebase origin/master
           git push origin HEAD:master
           cd ..
           unset GIT_SSH_COMMAND
