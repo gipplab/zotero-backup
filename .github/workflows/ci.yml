@@ -42,29 +42,29 @@ jobs:
           python-version: '3.7'
       - name: Install python requirements
         run: pip install -r requirements.txt
-      - name: Download Zotero data
-        run: python ./download.py
-        env:
-          ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
-      - name: Check data consistency
-        run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
-      - name: Push updates
+      #- name: Download Zotero data
+      #  run: python ./download.py
+      #  env:
+      #    ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
+      #- name: Check data consistency
+      #  run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
+      #- name: Push updates
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
         # from above does not exist here. Hence, we first update the link and after that
         # set the GIT_SSH_COMMAND again
-        run: |
-          git config --global user.name 'GitHub Deploy Action'
-          git config --global user.email 'github-actions@users.noreply.github.com'
-          cd data
-          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
-          git add -A
-          git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
-          git push origin HEAD:master
-          cd ..
-          unset GIT_SSH_COMMAND
-          git add -A
-          git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
-          git push
+      #  run: |
+      #    git config --global user.name 'GitHub Deploy Action'
+      #    git config --global user.email 'github-actions@users.noreply.github.com'
+      #    cd data
+      #    export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
+      #    git add -A
+      #    git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
+      #    git push origin HEAD:master
+      #    cd ..
+      #    unset GIT_SSH_COMMAND
+      #    git add -A
+      #    git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
+      #    git push
       - name: Notify Collaborators on Failure
         if: ${{ always() }}
         uses: dawidd6/action-send-mail@v3
@@ -74,6 +74,7 @@ jobs:
           username: ${{ secrets.NOTIF_MAIL_USER }}
           password: ${{ secrets.NOTIF_MAIL_PW }}
           subject: "GitHub CI Failure during Zotero Backup"
-          body: "${{ github.job }} job in workflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}.\nThe following JSON provide further information:\n${{ toJson(github) }}"
+          body: file://.github/failure-report-mail.html
+          convert_markdown: true
           to: andre.greiner-petter@t-online.de
           from: GitHub Zotero CI
