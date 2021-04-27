@@ -11,6 +11,10 @@ env:
   ZB_OUT_DIR: "data/ag-gipp"
   ZB_FILE: "${ZB_OUT_DIR}/latest.json"
   ZB_VERSION_FILE: "${ZB_OUT_DIR}/.last-modified-version"
+  ZB_PYTHON: python
+  ZB_LOG_LEVEL: INFO
+  PYTHONIOENCODING: "utf-8"
+  ZB_SEARCH_TAG: ""
 
 jobs:
   backup:
@@ -38,6 +42,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Download Zotero data
         run: python ./download.py
+        env:
+          ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
       - name: Push updates
