@@ -65,3 +65,15 @@ jobs:
           git add -A
           git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
           git push
+      - name: Notify Collaborators on Failure
+        if: ${{ always() }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.NOTIF_MAIL_SERVER }}
+          server_port: 465
+          username: ${{ secrets.NOTIF_MAIL_USER }}
+          password: ${{ secrets.NOTIF_MAIL_PW }}
+          subject: "GitHub CI Failure during Zotero Backup"
+          body: "${{ github.job }} job in workflow ${{ github.workflow }} of ${{ github.repository }} has ${{ job.status }}.\nThe following JSON provide further information:\n${{ toJson(github) }}"
+          to: andre.greiner-petter@t-online.de
+          from: GitHub Zotero CI
