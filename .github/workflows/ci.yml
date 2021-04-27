@@ -1,12 +1,12 @@
 name: CI Zotero Backup
 
-# Cron Job triggers via POSIX cron syntax in UTC. More details on
-# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events
-# Monday to Friday at 5:30am UTC 
-# - cron: '30 5 * * 1-5'
 on: 
   push:
     branches: [master]
+  schedule:
+    # More info under: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events
+    # Setup: Monday to Friday at 5:30am UTC 
+    - cron: '30 5 * * 1-5'
 
 env:
   ZB_SEARCH_PREFIX_URI: groups/2480461
@@ -42,38 +42,39 @@ jobs:
           python-version: '3.7'
       - name: Install python requirements
         run: pip install -r requirements.txt
-      #- name: Download Zotero data
-      #  run: python ./download.py
-      #  env:
-      #    ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
-      #- name: Check data consistency
-      #  run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
-      #- name: Push updates
+      - name: Download Zotero data
+        run: python ./download.py
+        env:
+          ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
+      - name: Check data consistency
+        run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
+      - name: Push updates
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
         # from above does not exist here. Hence, we first update the link and after that
         # set the GIT_SSH_COMMAND again
-      #  run: |
-      #    git config --global user.name 'GitHub Deploy Action'
-      #    git config --global user.email 'github-actions@users.noreply.github.com'
-      #    cd data
-      #    export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
-      #    git add -A
-      #    git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
-      #    git push origin HEAD:master
-      #    cd ..
-      #    unset GIT_SSH_COMMAND
-      #    git add -A
-      #    git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
-      #    git push
+        run: |
+          git config --global user.name 'GitHub Deploy Action'
+          git config --global user.email 'github-actions@users.noreply.github.com'
+          cd data
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
+          git add -A
+          git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
+          git push origin HEAD:master
+          cd ..
+          unset GIT_SSH_COMMAND
+          git add -A
+          git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
+          git push
       - name: Notify Collaborators on Failure
-        if: ${{ always() }}
+        if: ${{ failure() }}
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.NOTIF_MAIL_SERVER }}
           server_port: 465
           username: ${{ secrets.NOTIF_MAIL_USER }}
           password: ${{ secrets.NOTIF_MAIL_PW }}
-          subject: "GitHub CI Failure during Zotero Backup"
+          subject: "GitHub CI Zotero Backup Report ${{ job.status }}"
           html_body: '<p>The GitHub workflow ${{ github.workflow }} in ${{ github.repository }} finished on <b>${{ job.status }}</b></p><p>Further details can be accessed at the <a href="https://github.com/ag-gipp/zotero-backup/actions">GitHub CI overview page</a>.</p><p><b>Detailed Reasons:</b><br>Event causing the failure: ${{ github.event_name }}<br>Author: ${{ github.event.commits[0].author.name }}<br>E-Mail: ${{ github.event.commits[0].author.email }}<br>Commit Message: ${{ github.event.commits[0].message }}<br>Commit ID: <a href="${{ github.event.commits[0].url }}">${{ github.event.commits[0].id }}</a><br></p>'
-          to: andre.greiner-petter@t-online.de
+          # recipients' addresses split by comma
+          to: meuschke@gipplab.org
           from: GitHub Zotero CI
