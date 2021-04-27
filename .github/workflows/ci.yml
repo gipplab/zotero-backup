@@ -6,7 +6,7 @@ on:
   schedule:
     # More info under: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events
     # Setup: Monday to Friday at 5:30am UTC 
-    - cron: '30 5 * * 1-5'
+    - cron: '30 5 * * *'
 
 env:
   ZB_SEARCH_PREFIX_URI: groups/2480461
