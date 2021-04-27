@@ -9,8 +9,8 @@ on:
 env:
   ZB_SEARCH_PREFIX_URI: groups/2480461
   ZB_OUT_DIR: "data/ag-gipp"
-  ZB_FILE: "${ZB_OUT_DIR}/latest.json"
-  ZB_VERSION_FILE: "${ZB_OUT_DIR}/.last-modified-version"
+  ZB_FILE: "data/ag-gipp/latest.json"
+  ZB_VERSION_FILE: "data/ag-gipp/.last-modified-version"
   ZB_PYTHON: python
   ZB_LOG_LEVEL: INFO
   PYTHONIOENCODING: "utf-8"
