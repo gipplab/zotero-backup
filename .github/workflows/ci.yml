@@ -74,7 +74,7 @@ jobs:
           username: ${{ secrets.NOTIF_MAIL_USER }}
           password: ${{ secrets.NOTIF_MAIL_PW }}
           subject: "GitHub CI Failure during Zotero Backup"
-          body: file://.github/failure-report-mail.html
+          body: file://.github/failure-report-mail.md
           convert_markdown: true
           to: andre.greiner-petter@t-online.de
           from: GitHub Zotero CI
