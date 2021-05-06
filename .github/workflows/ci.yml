@@ -49,6 +49,7 @@ jobs:
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
       - name: Push updates
+        if: ${{ failure() || success() }}
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
         # from above does not exist here. Hence, we first update the link and after that
         # set the GIT_SSH_COMMAND again
