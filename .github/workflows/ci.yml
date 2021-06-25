@@ -48,6 +48,8 @@ jobs:
           ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
+      - name: Extract decentralized open science publist
+        run: python ./extract-bibtex.py "$ZB_FILE" decentralized_open_science > "/bib/decentralized_open_science.bib"
       - name: Push updates
         if: ${{ failure() || success() }}
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
@@ -60,6 +62,11 @@ jobs:
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
           git add -A
           git commit -am "[skip ci] Update backup data (build ${GITHUB_RUN_ID})"
+          git push origin HEAD:master
+          cd ..
+          cd bib
+          git add -A
+          git commit -am "[skip ci] Update bib data (build ${GITHUB_RUN_ID})"
           git push origin HEAD:master
           cd ..
           unset GIT_SSH_COMMAND
