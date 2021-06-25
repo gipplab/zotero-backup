@@ -49,7 +49,7 @@ jobs:
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
       - name: Extract decentralized open science publist
-        run: python ./extract-bibtex.py "$ZB_FILE" decentralized_open_science > "/bib/decentralized_open_science.bib"
+        run: python ./extract-bibtex.py "$ZB_FILE" decentralized_open_science > "bib/decentralized_open_science.bib"
       - name: Push updates
         if: ${{ failure() || success() }}
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
