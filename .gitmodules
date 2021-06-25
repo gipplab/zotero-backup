@@ -1,3 +1,6 @@
 [submodule "data"]
     path = data
     url = git@github.com:ag-gipp/backup-data-zotero.git
+[submodule "bib"]
+	path = bib
+	url = git@github.com:ag-gipp/bib.git

@@ -10,6 +10,9 @@ $(ZB_VERSION_FILE):
 $(ZB_FILE): $(ZB_VERSION_FILE)
 	$(ZB_PYTHON) ./download.py
 
+bib: $(ZB_FILE):
+    $(ZB_PYTHON) ./extract-bibtex.py $(ZB_FILE)
+
 clean:
 	rm -rf $(ZB_OUT_DIR)
 
