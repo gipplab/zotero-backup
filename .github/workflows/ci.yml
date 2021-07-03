@@ -71,8 +71,8 @@ jobs:
           cd ..
           cd bib
           git add -A
-          git commit -am "[skip ci] Update bib data (build ${GITHUB_RUN_ID})"
-          git push origin HEAD:master
+          git commit -am "[skip ci] Update bib data (build ${GITHUB_RUN_ID})" || true
+          git push origin HEAD:master || true
           cd ..
           unset GIT_SSH_COMMAND
           git add -A
