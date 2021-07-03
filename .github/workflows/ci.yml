@@ -49,6 +49,7 @@ jobs:
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
       - name: Extract decentralized open science publist
+        if: ${{ failure() || success() }}
         run: python ./extract-bibtex.py "$ZB_FILE" decentralized_open_science > "bib/decentralized_open_science.bib"
       - name: Create decentralized open science publist
         run: |
@@ -61,8 +62,8 @@ jobs:
         # from above does not exist here. Hence, we first update the link and after that
         # set the GIT_SSH_COMMAND again
         run: |
-          git config --global user.name 'GitHub Deploy Action'
-          git config --global user.email 'github-actions@users.noreply.github.com'
+          git config --global user.name 'BinBot'
+          git config --global user.email 'bibbot@ckurs.de'
           cd data
           export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/data_deploy.key"
           git add -A
