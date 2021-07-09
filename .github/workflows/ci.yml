@@ -56,6 +56,14 @@ jobs:
           cd bib
           ./support/pubAll.sh decentralized_open_science
           cd ..
+      - name: Extract moritz publist
+        if: ${{ failure() || success() }}
+        run: python ./extract-bibtex.py "$ZB_FILE" \!ms_author > "bib/list.bib"
+      - name: Create moritz publist
+        run: |
+          cd bib
+          ./support/pubAll.sh list
+          cd ..
       - name: Push updates
         if: ${{ failure() || success() }}
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
