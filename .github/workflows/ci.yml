@@ -49,7 +49,6 @@ jobs:
       - name: Check data consistency
         run: python ./consistency-report.py "$ZB_FILE" > "$ZB_OUT_DIR/report.md"
       - name: Extract decentralized open science publist
-        if: ${{ failure() || success() }}
         run: python ./extract-bibtex.py "$ZB_FILE" decentralized_open_science > "bib/decentralized_open_science.bib"
       - name: Create decentralized open science publist
         run: |
@@ -57,7 +56,6 @@ jobs:
           ./support/pubAll.sh decentralized_open_science
           cd ..
       - name: Extract moritz publist
-        if: ${{ failure() || success() }}
         run: python ./extract-bibtex.py "$ZB_FILE" \!ms_author > "bib/list.bib"
       - name: Create moritz publist
         run: |
@@ -65,7 +63,6 @@ jobs:
           ./support/pubAll.sh list
           cd ..
       - name: Push updates
-        if: ${{ failure() || success() }}
         # Environment variables do not survive steps. The exported GIT_SSH_COMMAND
         # from above does not exist here. Hence, we first update the link and after that
         # set the GIT_SSH_COMMAND again
@@ -88,7 +85,7 @@ jobs:
           git commit -am "[skip ci] Update link to backup data (build ${GITHUB_RUN_ID})"
           git push
       - name: Notify Collaborators on Failure
-        if: ${{ failure() }}
+        if: '(test -f "$ZB_OUT_DIR/report.md" && error report exists) || echo error report does not exist, skipping step'
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.NOTIF_MAIL_SERVER }}
