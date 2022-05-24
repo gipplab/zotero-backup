@@ -52,6 +52,8 @@ with open(filename) as f:
     file_pat = re.compile('--[a-zA-Z]{2,}--')
     for entry in bibtex:
         data = entry['data']
+        if data['itemType'] == 'annotation':
+            continue
         tags = data['tags']
         biblatex = entry['biblatex']
         all_keys.append(data['key'])
