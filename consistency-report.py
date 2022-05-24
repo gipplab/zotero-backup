@@ -74,5 +74,3 @@ with open(filename) as f:
     if len(log) > 0:
         for key, value in log.items():
             print(f'### {key}\n\n{value}\n\n')
-
-        exit(1)
