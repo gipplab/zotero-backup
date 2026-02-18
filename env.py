@@ -3,6 +3,7 @@
 
 import logging
 import os
+import dotenv
 
 __ready__ = False
 
@@ -38,6 +39,8 @@ def init():
     """ready the environment"""
     global __ready__
     if not __ready__:
+        dotenv.load_dotenv()
+        dotenv.load_dotenv( dotenv.find_dotenv('.env.local') )
         _init_logger()
         __ready__ = True
 
