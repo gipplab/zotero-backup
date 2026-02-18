@@ -8,7 +8,7 @@ This code basically just downloads a bibliography using the
 [Zotero API](https://www.zotero.org/support/dev/web_api/v3/basics),
 It asks Zotero politely whether the bibliography has changed since the last run, to keep things lightweight unless things have changed.
 
-
+It also triggers the generation of https://gipplab.github.io/bib/publist.html
 # requirements
 
 * python 3.7.x
