@@ -4,7 +4,7 @@
 """Download PDF attachments for bibliography entries from the Zotero API.
 
 For each item matching the given tag filter in the JSON data file, this script:
-- Names the PDF using the BibTeX citation key (from the biblatex entry header)
+- Names the PDF using the BibTeX citation key (from data['citationKey'])
 - Skips download if the PDF already exists in the output directory
 - Downloads the PDF from the Zotero API
 - Updates the Zotero item with tex.preprint pointing to the hosted PDF URL
@@ -17,7 +17,6 @@ Usage:
 import argparse
 import json
 import os
-import re
 import sys
 
 import requests
@@ -28,7 +27,6 @@ import env
 logger = env.logger()
 
 PREPRINTS_BASE_URL = "https://ag-gipp.github.io/bib/preprints"
-_BIBLATEX_KEY_RE = re.compile(r"@\w+\{([^,\s]+)")
 
 
 def _api_headers(extra=None):
@@ -47,16 +45,15 @@ def _api_headers(extra=None):
 
 
 def get_citation_key(entry):
-    """Extract the BibTeX citation key from the biblatex entry header.
+    """Extract the BibTeX citation key for the entry.
 
-    Falls back to parsing the 'Citation Key' line in the extra field,
-    and finally to None if neither source yields a key.
+    Prefers data['citationKey'] (set by Better BibTeX), falls back to
+    parsing the 'Citation Key' line in the extra field, and finally to None.
     """
-    biblatex = entry.get("biblatex", "")
-    if biblatex:
-        m = _BIBLATEX_KEY_RE.match(biblatex)
-        if m:
-            return m.group(1)
+    # Primary: use the structured citationKey field in data
+    cite_key = entry.get("data", {}).get("citationKey")
+    if cite_key:
+        return cite_key
     # Fallback: parse from extra field
     extra = entry.get("data", {}).get("extra", "") or ""
     for line in extra.split("\n"):
