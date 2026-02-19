@@ -4,23 +4,20 @@
 """Download PDF attachments for bibliography entries from the Zotero API.
 
 For each item matching the given tag filter in the JSON data file, this script:
-- Names the PDF using the BibTeX citation key (from the extra field)
+- Names the PDF using the BibTeX citation key (from the biblatex entry header)
 - Skips download if the PDF already exists in the output directory
 - Downloads the PDF from the Zotero API
 - Updates the Zotero item with tex.preprint pointing to the hosted PDF URL
-  if that field is not already set
+  if that field is not already set (controlled by --max-writes)
 
 Usage:
-    python download-pdfs.py <json_file> [<tag>] [<output_dir>]
-
-Arguments:
-    json_file   Path to the JSON file produced by download.py
-    tag         Optional tag to filter items (e.g. '!ms_author')
-    output_dir  Directory to save downloaded PDFs (default: bib/docs/preprints)
+    python download-pdfs.py <json_file> [--tag TAG] [--output-dir DIR] [--max-writes N]
 """
 
+import argparse
 import json
 import os
+import re
 import sys
 
 import requests
@@ -31,6 +28,7 @@ import env
 logger = env.logger()
 
 PREPRINTS_BASE_URL = "https://ag-gipp.github.io/bib/preprints"
+_BIBLATEX_KEY_RE = re.compile(r"@\w+\{([^,\s]+)")
 
 
 def _api_headers(extra=None):
@@ -48,23 +46,31 @@ def _api_headers(extra=None):
     return headers
 
 
-def get_citation_key(data):
-    """Extract the BibTeX citation key from the extra field."""
-    extra = data.get("extra", "")
-    if extra:
-        for line in extra.split("\n"):
-            if line.lower().startswith("citation key:"):
-                return line.split(":", 1)[1].strip()
+def get_citation_key(entry):
+    """Extract the BibTeX citation key from the biblatex entry header.
+
+    Falls back to parsing the 'Citation Key' line in the extra field,
+    and finally to None if neither source yields a key.
+    """
+    biblatex = entry.get("biblatex", "")
+    if biblatex:
+        m = _BIBLATEX_KEY_RE.match(biblatex)
+        if m:
+            return m.group(1)
+    # Fallback: parse from extra field
+    extra = entry.get("data", {}).get("extra", "") or ""
+    for line in extra.split("\n"):
+        if line.lower().startswith("citation key:"):
+            return line.split(":", 1)[1].strip()
     return None
 
 
 def has_preprint_field(data):
     """Return True if tex.preprint is already set in the extra field."""
-    extra = data.get("extra", "")
-    if extra:
-        for line in extra.split("\n"):
-            if line.lower().startswith("tex.preprint:"):
-                return True
+    extra = data.get("extra", "") or ""
+    for line in extra.split("\n"):
+        if line.lower().startswith("tex.preprint:"):
+            return True
     return False
 
 
@@ -122,17 +128,21 @@ def update_preprint_url(item_key, item_version, current_extra, preprint_url):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(__doc__)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("json_file", help="Path to the JSON file produced by download.py")
+    parser.add_argument("--tag", default=None,
+                        help="Tag to filter items (e.g. '!ms_author')")
+    parser.add_argument("--output-dir", default="bib/docs/preprints",
+                        help="Directory to save downloaded PDFs (default: bib/docs/preprints)")
+    parser.add_argument("--max-writes", type=int, default=None, metavar="N",
+                        help="Maximum number of Zotero items to update with tex.preprint "
+                             "(useful for testing; default: unlimited)")
+    args = parser.parse_args()
 
-    json_file = sys.argv[1]
-    tag = sys.argv[2] if len(sys.argv) > 2 else None
-    output_dir = sys.argv[3] if len(sys.argv) > 3 else "bib/docs/preprints"
+    os.makedirs(args.output_dir, exist_ok=True)
 
-    os.makedirs(output_dir, exist_ok=True)
-
-    with open(json_file) as f:
+    with open(args.json_file) as f:
         items = json.loads(f.read())
 
     # Build a map of item key -> entry for parent lookups
@@ -144,8 +154,8 @@ def main():
         data = entry["data"]
         if data["itemType"] in ("attachment", "note", "annotation"):
             continue
-        if tag:
-            tag_found = any(t["tag"] == tag for t in data.get("tags", []))
+        if args.tag:
+            tag_found = any(t["tag"] == args.tag for t in data.get("tags", []))
         else:
             tag_found = True
         if tag_found:
@@ -156,6 +166,7 @@ def main():
     # Download PDF attachments for matching items
     downloaded = 0
     skipped = 0
+    writes_done = 0
     for entry in items:
         data = entry["data"]
         if data["itemType"] != "attachment":
@@ -172,10 +183,10 @@ def main():
         parent_data = parent_entry["data"]
 
         # Determine filename from citation key, fall back to original filename
-        cite_key = get_citation_key(parent_data)
+        cite_key = get_citation_key(parent_entry)
         filename = (cite_key + ".pdf") if cite_key else (data.get("filename") or (data["key"] + ".pdf"))
 
-        filepath = os.path.join(output_dir, filename)
+        filepath = os.path.join(args.output_dir, filename)
 
         # Skip if already downloaded
         if os.path.exists(filepath):
@@ -184,22 +195,27 @@ def main():
             continue
 
         # Download the PDF
-        result = download_pdf(data["key"], filename, output_dir)
+        result = download_pdf(data["key"], filename, args.output_dir)
         if result:
             downloaded += 1
-            # Update tex.preprint in Zotero if not already set
+            # Update tex.preprint in Zotero if not already set and writes remain
             if not has_preprint_field(parent_data):
-                preprint_url = "%s/%s" % (PREPRINTS_BASE_URL, filename)
-                update_preprint_url(
-                    parent_key,
-                    parent_entry["version"],
-                    parent_data.get("extra", ""),
-                    preprint_url,
-                )
+                if args.max_writes is None or writes_done < args.max_writes:
+                    preprint_url = "%s/%s" % (PREPRINTS_BASE_URL, filename)
+                    if update_preprint_url(
+                        parent_key,
+                        parent_entry["version"],
+                        parent_data.get("extra") or "",
+                        preprint_url,
+                    ):
+                        writes_done += 1
+                else:
+                    logger.info("Skipping tex.preprint update for %s (max-writes reached)" % parent_key)
 
-    logger.info("Downloaded %d new PDF(s), skipped %d existing (dir: %s)"
-                % (downloaded, skipped, output_dir))
+    logger.info("Downloaded %d new PDF(s), skipped %d existing, %d Zotero item(s) updated (dir: %s)"
+                % (downloaded, skipped, writes_done, args.output_dir))
 
 
 if __name__ == "__main__":
     main()
+
