@@ -12,11 +12,15 @@ except IndexError:
 def undo_better_bibtex_hack(biblatex, extra=""):
     biblatex = biblatex[:-2]
     for line in extra.split("\n"):
-        if line.startswith("tex."):
-            payload = line[4:]
-            key, value = payload.split(": ", 1)
-            biblatex += f"\n\t{key} = {{{value}}},"
-    return biblatex+"\n}"
+        try:
+            if line.startswith("tex."):
+                payload = line[4:]
+                key, value = payload.split(": ", 1)
+                biblatex += f"\n\t{key} = {{{value}}},"
+        except ValueError:
+            pass
+        return biblatex+"\n}"
+    return None
 
 
 with open(filename) as f:
