@@ -14,8 +14,8 @@ bib: $(ZB_FILE)
 	$(ZB_PYTHON) ./extract-bibtex.py $(ZB_FILE)
 
 pdfs: $(ZB_FILE)
-	mkdir -p bib/preprints
-	$(ZB_PYTHON) ./download-pdfs.py $(ZB_FILE) $(ZB_SEARCH_TAG) bib/preprints
+	mkdir -p bib/docs/preprints
+	$(ZB_PYTHON) ./download-pdfs.py $(ZB_FILE) $(ZB_SEARCH_TAG) bib/docs/preprints
 
 clean:
 	rm -rf $(ZB_OUT_DIR)

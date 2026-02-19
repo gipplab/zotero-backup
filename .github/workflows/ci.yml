@@ -51,7 +51,7 @@ jobs:
       - name: Extract moritz publist
         run: python ./extract-bibtex.py "$ZB_FILE" \!ms_author > "bib/list.bib"
       - name: Download PDFs for moritz publist
-        run: python ./download-pdfs.py "$ZB_FILE" \!ms_author bib/preprints
+        run: python ./download-pdfs.py "$ZB_FILE" \!ms_author bib/docs/preprints
         env:
           ZB_API_KEY: ${{ secrets.ZB_API_KEY }}
       - name: Create moritz publist
