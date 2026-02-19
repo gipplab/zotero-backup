@@ -13,13 +13,13 @@ jobs:
     name: Backup Zotero
     runs-on: ubuntu-latest
     steps:
-      - name: Load .env file
-        run: |
-          cat .env >> $GITHUB_ENV
       - name: Checkout Zotero backup repo
         uses: actions/checkout@v2
         with:
           submodules: 'false'
+      - name: Load .env file
+        run: |
+          cat .env >> $GITHUB_ENV
       - name: Checkout private data submodule
         env: 
           DATA_SSH_KEY: ${{ secrets.BACKUP_DATA_ZOTERO_REPO_KEY }}
