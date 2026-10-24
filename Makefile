@@ -13,6 +13,10 @@ $(ZB_FILE): $(ZB_VERSION_FILE)
 bib: $(ZB_FILE)
 	$(ZB_PYTHON) ./extract-bibtex.py $(ZB_FILE)
 
+pdfs: $(ZB_FILE)
+	mkdir -p bib/docs/preprints
+	$(ZB_PYTHON) ./download-pdfs.py $(ZB_FILE) --tag $(ZB_SEARCH_TAG) --output-dir bib/docs/preprints
+
 clean:
 	rm -rf $(ZB_OUT_DIR)
 
